@@ -57,7 +57,7 @@ export class UsersService {
 
   async updatePhoneNumber(id: number, user: UpdatePhoneNumberDto) {
     try {
-      return this.prismaService.user.update({
+      return await this.prismaService.user.update({
         data: {
           phoneNumber: user.phoneNumber,
         },
@@ -66,6 +66,12 @@ export class UsersService {
         },
       });
     } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
       throw error;
     }
   }

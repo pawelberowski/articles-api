@@ -1,5 +1,5 @@
 import { Article } from '@prisma/client';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 function shortenText(text: string) {
@@ -12,17 +12,22 @@ function shortenText(text: string) {
   return text;
 }
 
-export function capitalizeTitle(title: string) {
-  return title[0].toUpperCase() + title.substring(1);
+export function capitalizeTitle({ value }: TransformFnParams) {
+  return value[0].toUpperCase() + value.substring(1);
+}
+
+function getTextLength({ obj }: TransformFnParams) {
+  if (!obj.text) {
+    return null;
+  }
+  return obj.text.length;
 }
 
 export class ArticlesResponseDto implements Article {
   id: number;
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => {
-    return capitalizeTitle(value);
-  })
+  @Transform(capitalizeTitle)
   title: string;
 
   @IsString()
@@ -33,11 +38,6 @@ export class ArticlesResponseDto implements Article {
   text: string | null;
 
   @Expose()
-  @Transform(({ obj }) => {
-    if (!obj.text) {
-      return null;
-    }
-    return obj.text?.length;
-  })
+  @Transform(getTextLength)
   textLength: number | null;
 }

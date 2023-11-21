@@ -31,7 +31,7 @@ export class AuthenticationService {
     id: number,
     updatePhoneNumberData: UpdatePhoneNumberDto,
   ) {
-    return await this.usersService.updatePhoneNumber(id, updatePhoneNumberData);
+    return this.usersService.updatePhoneNumber(id, updatePhoneNumberData);
   }
 
   private async verifyPassword(

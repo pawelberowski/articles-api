@@ -24,5 +24,5 @@ export class SignUpDto {
 
   @IsPhoneNumber()
   @IsOptional()
-  phoneNumber?: string;
+  phoneNumber?: string | null;
 }
