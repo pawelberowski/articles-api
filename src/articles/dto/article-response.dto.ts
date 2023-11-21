@@ -7,9 +7,7 @@ export class ArticleResponseDto implements Article {
   id: number;
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => {
-    return capitalizeTitle(value);
-  })
+  @Transform(capitalizeTitle)
   title: string;
 
   @IsString()

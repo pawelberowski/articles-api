@@ -2,7 +2,7 @@ import { Article } from '@prisma/client';
 import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-function shortenText(text: string) {
+function shortenText({ value: text }: TransformFnParams) {
   if (!text) {
     return null;
   }
@@ -32,9 +32,7 @@ export class ArticlesResponseDto implements Article {
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => {
-    return shortenText(value);
-  })
+  @Transform(shortenText)
   text: string | null;
 
   @Expose()
