@@ -13,12 +13,15 @@ import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
+import { TransformPlainToInstance } from 'class-transformer';
+import { ArticlesResponseDto } from './dto/articles-response.dto';
 
 @Controller('articles')
 export default class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Get()
+  @TransformPlainToInstance(ArticlesResponseDto)
   getAll() {
     return this.articlesService.getAll();
   }
@@ -30,6 +33,7 @@ export default class ArticlesController {
 
   @Post()
   @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticlesResponseDto)
   create(@Body() article: CreateArticleDto) {
     return this.articlesService.create(article);
   }
