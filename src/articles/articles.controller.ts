@@ -15,6 +15,7 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { TransformPlainToInstance } from 'class-transformer';
 import { ArticlesResponseDto } from './dto/articles-response.dto';
+import { ArticleResponseDto } from './dto/article-response.dto';
 
 @Controller('articles')
 export default class ArticlesController {
@@ -27,6 +28,7 @@ export default class ArticlesController {
   }
 
   @Get(':id')
+  @TransformPlainToInstance(ArticleResponseDto)
   getById(@Param('id', ParseIntPipe) id: number) {
     return this.articlesService.getById(id);
   }
@@ -39,6 +41,8 @@ export default class ArticlesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticleResponseDto)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() article: UpdateArticleDto,
@@ -47,6 +51,8 @@ export default class ArticlesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticleResponseDto)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.articlesService.delete(id);
   }

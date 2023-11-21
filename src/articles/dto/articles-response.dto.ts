@@ -25,6 +25,7 @@ export class ArticlesResponseDto implements Article {
   })
   title: string;
 
+  @IsString()
   @IsOptional()
   @Transform(({ value }) => {
     return shortenText(value);
@@ -38,5 +39,5 @@ export class ArticlesResponseDto implements Article {
     }
     return obj.text?.length;
   })
-  textLength: string | null;
+  textLength: number | null;
 }
