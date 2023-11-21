@@ -7,6 +7,7 @@ import { PrismaError } from '../database/prisma-error.enum';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './user.dto';
+import { UpdatePhoneNumberDto } from '../authentication/dto/update-phone-number.dto';
 
 @Injectable()
 export class UsersService {
@@ -50,6 +51,21 @@ export class UsersService {
       ) {
         throw new ConflictException('User with that email already exists');
       }
+      throw error;
+    }
+  }
+
+  async updatePhoneNumber(id: number, user: UpdatePhoneNumberDto) {
+    try {
+      return this.prismaService.user.update({
+        data: {
+          phoneNumber: user.phoneNumber,
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
       throw error;
     }
   }

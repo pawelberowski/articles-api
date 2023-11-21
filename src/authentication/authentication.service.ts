@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LogInDto } from './dto/log-in.dto';
 import { TokenPayload } from './token-payload.interface';
+import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -24,6 +25,13 @@ export class AuthenticationService {
       phoneNumber: signUpData.phoneNumber,
       password: hashedPassword,
     });
+  }
+
+  async updatePhoneNumber(
+    id: number,
+    updatePhoneNumberData: UpdatePhoneNumberDto,
+  ) {
+    return await this.usersService.updatePhoneNumber(id, updatePhoneNumberData);
   }
 
   private async verifyPassword(
