@@ -6,7 +6,8 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post, Req,
+  Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
@@ -16,7 +17,7 @@ import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.gua
 import { TransformPlainToInstance } from 'class-transformer';
 import { ArticlesResponseDto } from './dto/articles-response.dto';
 import { ArticleDetailsResponseDto } from './dto/article-details-response.dto';
-import {RequestWithUser} from "../authentication/request-with-user.interface";
+import { RequestWithUser } from '../authentication/request-with-user.interface';
 
 @Controller('articles')
 export default class ArticlesController {

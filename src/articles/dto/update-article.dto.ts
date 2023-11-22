@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 import { CanBeUndefined } from '../../utilities/can-be-undefined';
 
 export class UpdateArticleDto {
@@ -11,4 +11,8 @@ export class UpdateArticleDto {
   @IsNotEmpty()
   @CanBeUndefined()
   title?: string;
+
+  @CanBeUndefined()
+  @IsNumber({}, { each: true })
+  categoryIds?: number[];
 }
