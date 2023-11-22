@@ -6,8 +6,8 @@ import {
 import { PrismaError } from '../database/prisma-error.enum';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
-import { UserDto } from './user.dto';
-import { UpdatePhoneNumberDto } from '../authentication/dto/update-phone-number.dto';
+import { UserDto } from './dto/user.dto';
+import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
 
 @Injectable()
 export class UsersService {

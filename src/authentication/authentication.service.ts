@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LogInDto } from './dto/log-in.dto';
 import { TokenPayload } from './token-payload.interface';
-import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
+import { UpdatePhoneNumberDto } from '../users/dto/update-phone-number.dto';
 
 @Injectable()
 export class AuthenticationService {
