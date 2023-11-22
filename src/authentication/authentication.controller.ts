@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpCode,
-  Patch,
   Post,
   Req,
   Res,
@@ -17,7 +16,6 @@ import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { RequestWithUser } from './request-with-user.interface';
 import { AuthenticationResponseDto } from './dto/authentication-response.dto';
 import { TransformPlainToInstance } from 'class-transformer';
-import { UpdatePhoneNumberDto } from '../users/dto/update-phone-number.dto';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -48,17 +46,6 @@ export class AuthenticationController {
   async logOut(@Res({ passthrough: true }) response: Response) {
     const cookie = this.authenticationService.getCookieForLogOut();
     response.setHeader('Set-Cookie', cookie);
-  }
-
-  @UseGuards(JwtAuthenticationGuard)
-  @Patch('update-phone-number')
-  @TransformPlainToInstance(AuthenticationResponseDto)
-  async updatePhoneNumber(
-    @Req() request: RequestWithUser,
-    @Body() phoneNumber: UpdatePhoneNumberDto,
-  ) {
-    const userId = request.user.id;
-    return this.authenticationService.updatePhoneNumber(userId, phoneNumber);
   }
 
   @UseGuards(JwtAuthenticationGuard)
