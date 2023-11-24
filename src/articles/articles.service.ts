@@ -22,7 +22,7 @@ export class ArticlesService {
       include: {
         author: true,
         categories: true,
-      }
+      },
     });
     if (!article) {
       throw new ArticleNotFoundException(id);
