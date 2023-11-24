@@ -8,4 +8,7 @@ export class UserDto {
     city: string;
     country: string;
   };
+  profileImage?: {
+    imageUrl: string;
+  };
 }

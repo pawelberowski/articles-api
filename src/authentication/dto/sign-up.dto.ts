@@ -11,6 +11,7 @@ import {
 import { AddressDto } from '../../users/dto/address.dto';
 import { CanBeUndefined } from '../../utilities/can-be-undefined';
 import { Type } from 'class-transformer';
+import { ProfileImageDto } from '../../users/dto/profile-image.dto';
 
 export class SignUpDto {
   @IsString()
@@ -30,9 +31,16 @@ export class SignUpDto {
   @IsPhoneNumber()
   @IsOptional()
   phoneNumber?: string | null;
+
   @CanBeUndefined()
   @Type(() => AddressDto)
   @IsObject()
   @ValidateNested()
   address?: AddressDto;
+
+  @CanBeUndefined()
+  @Type(() => ProfileImageDto)
+  @IsObject()
+  @ValidateNested()
+  profileImage?: ProfileImageDto;
 }

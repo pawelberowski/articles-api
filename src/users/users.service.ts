@@ -21,6 +21,7 @@ export class UsersService {
       include: {
         address: true,
         Article: true,
+        profileImage: true,
       },
     });
     if (!user) {
@@ -38,6 +39,7 @@ export class UsersService {
       include: {
         address: true,
         Article: true,
+        profileImage: true,
       },
     });
     if (!user) {
@@ -58,9 +60,13 @@ export class UsersService {
           address: {
             create: user.address,
           },
+          profileImage: {
+            create: user.profileImage,
+          },
         },
         include: {
           address: true,
+          profileImage: true,
         },
       });
     } catch (error) {
