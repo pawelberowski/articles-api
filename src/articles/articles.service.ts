@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { Prisma } from '@prisma/client';
@@ -117,5 +121,20 @@ export class ArticlesService {
       }
       throw error;
     }
+  }
+
+  deleteMultipleArticles(ids: number[]) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const deleteResponse = await transactionClient.article.deleteMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+      });
+      if (deleteResponse.count !== ids.length) {
+        throw new NotFoundException('One of the articles could not be deleted');
+      }
+    });
   }
 }
