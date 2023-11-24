@@ -19,6 +19,10 @@ export class ArticlesService {
       where: {
         id,
       },
+      include: {
+        author: true,
+        categories: true,
+      }
     });
     if (!article) {
       throw new ArticleNotFoundException(id);
