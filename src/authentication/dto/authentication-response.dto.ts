@@ -1,4 +1,4 @@
-import { Address, User } from '@prisma/client';
+import {Address, User} from '@prisma/client';
 import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 
 function obscurePhoneNumber({ value: phoneNumber }: TransformFnParams) {
@@ -24,4 +24,5 @@ export class AuthenticationResponseDto implements User {
   addressId: number;
 
   address?: Address;
+
 }

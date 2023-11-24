@@ -20,6 +20,7 @@ export class UsersService {
       },
       include: {
         address: true,
+        Article: true,
       },
     });
     if (!user) {
@@ -36,6 +37,7 @@ export class UsersService {
       },
       include: {
         address: true,
+        Article: true,
       },
     });
     if (!user) {
