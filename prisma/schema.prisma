@@ -14,12 +14,20 @@ model Article {
   author     User       @relation(fields: [authorId], references: [id])
   authorId   Int
   categories Category[]
+  comments   Comment[]
 }
 
 model Category {
   id       Int       @id @default(autoincrement())
   name     String
   articles Article[]
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  text      String
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
 }
 
 model Address {
