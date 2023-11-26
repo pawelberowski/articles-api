@@ -10,6 +10,7 @@ import { PrismaError } from '../database/prisma-error.enum';
 import { ArticleNotFoundException } from './article-not-found.exception';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { GetArticlesByUpvotesDto } from './dto/get-articles-by-upvotes.dto';
+import { ChangeAuthorsDto } from './dto/change-authors.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -191,6 +192,33 @@ export class ArticlesService {
       });
       if (deleteResponse.count !== articleIds.length) {
         throw new NotFoundException('One of the articles could not be deleted');
+      }
+    });
+  }
+
+  changeAuthors(queryParams: ChangeAuthorsDto) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const articlesToReassign = await transactionClient.article.findMany({
+        where: {
+          authorId: queryParams.previousAuthor,
+        },
+      });
+      if (!articlesToReassign.length) {
+        throw new NotFoundException('No articles to reassign');
+      }
+      const articleIds = articlesToReassign.map((article) => article.id);
+      const updateResponse = await transactionClient.article.updateMany({
+        where: {
+          id: {
+            in: articleIds,
+          },
+        },
+        data: {
+          authorId: queryParams.newAuthor,
+        },
+      });
+      if (updateResponse.count !== articleIds.length) {
+        throw new NotFoundException('One of the articles could not be reassigned');
       }
     });
   }

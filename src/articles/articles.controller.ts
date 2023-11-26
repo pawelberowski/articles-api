@@ -20,6 +20,7 @@ import { ArticlesResponseDto } from './dto/articles-response.dto';
 import { ArticleDetailsResponseDto } from './dto/article-details-response.dto';
 import { RequestWithUser } from '../authentication/request-with-user.interface';
 import { GetArticlesByUpvotesDto } from './dto/get-articles-by-upvotes.dto';
+import { ChangeAuthorsDto } from './dto/change-authors.dto';
 
 @Controller('articles')
 export default class ArticlesController {
@@ -52,6 +53,13 @@ export default class ArticlesController {
     @Body() article: UpdateArticleDto,
   ) {
     return this.articlesService.update(id, article);
+  }
+
+  @Patch()
+  @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticlesResponseDto)
+  async changeAuthors(@Query() queryParams: ChangeAuthorsDto) {
+    await this.articlesService.changeAuthors(queryParams);
   }
 
   @Delete(':id')
