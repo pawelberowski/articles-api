@@ -58,4 +58,19 @@ export default class ArticlesController {
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.articlesService.delete(id);
   }
+
+  @Post(':id/upvote')
+  @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticleDetailsResponseDto)
+  async upvote(@Param('id', ParseIntPipe) id: number) {
+    await this.articlesService.upvote(id);
+  }
+
+  @Post(':id/downvote')
+  @UseGuards(JwtAuthenticationGuard)
+  @TransformPlainToInstance(ArticleDetailsResponseDto)
+  async downvote(@Param('id', ParseIntPipe) id: number) {
+    await this.articlesService.downvote(id);
+  }
+
 }

@@ -29,4 +29,6 @@ export class ArticlesResponseDto {
   @Expose()
   @Transform(getTextLength)
   textLength: number | null;
+
+  upvotes: number;
 }

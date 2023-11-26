@@ -6,4 +6,5 @@ export class ArticleDetailsResponseDto {
   @Transform(capitalizeTitle)
   title: string;
   text: string | null;
+  upvotes: number;
 }

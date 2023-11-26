@@ -137,4 +137,34 @@ export class ArticlesService {
       }
     });
   }
+
+  upvote(id: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      await transactionClient.article.update({
+        where: {
+          id,
+        },
+        data: {
+          upvotes: {
+            increment: 1,
+          },
+        },
+      });
+    });
+  }
+
+  downvote(id: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      await transactionClient.article.update({
+        where: {
+          id,
+        },
+        data: {
+          upvotes: {
+            decrement: 1,
+          },
+        },
+      });
+    });
+  }
 }
