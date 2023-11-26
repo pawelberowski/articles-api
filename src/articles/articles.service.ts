@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
 import { ArticleNotFoundException } from './article-not-found.exception';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { GetArticlesByUpvotesDto } from './dto/get-articles-by-upvotes.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -165,6 +166,32 @@ export class ArticlesService {
           },
         },
       });
+    });
+  }
+
+  deleteByUpvotes(queryParams: GetArticlesByUpvotesDto) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const articlesToDelete = await transactionClient.article.findMany({
+        where: {
+          upvotes: {
+            lt: queryParams.upvotesFewerThan,
+          },
+        },
+      });
+      if (!articlesToDelete) {
+        throw new NotFoundException('Theres no Articles to delete');
+      }
+      const articleIds = articlesToDelete.map((article) => article.id);
+      const deleteResponse = await transactionClient.article.deleteMany({
+        where: {
+          id: {
+            in: articleIds,
+          },
+        },
+      });
+      if (deleteResponse.count !== articleIds.length) {
+        throw new NotFoundException('One of the articles could not be deleted');
+      }
     });
   }
 }

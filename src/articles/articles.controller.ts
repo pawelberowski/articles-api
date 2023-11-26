@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { TransformPlainToInstance } from 'class-transformer';
 import { ArticlesResponseDto } from './dto/articles-response.dto';
 import { ArticleDetailsResponseDto } from './dto/article-details-response.dto';
 import { RequestWithUser } from '../authentication/request-with-user.interface';
+import { GetArticlesByUpvotesDto } from './dto/get-articles-by-upvotes.dto';
 
 @Controller('articles')
 export default class ArticlesController {
@@ -59,6 +61,12 @@ export default class ArticlesController {
     await this.articlesService.delete(id);
   }
 
+  @Delete()
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteByUpvote(@Query() queryParams: GetArticlesByUpvotesDto) {
+    await this.articlesService.deleteByUpvotes(queryParams);
+  }
+
   @Post(':id/upvote')
   @UseGuards(JwtAuthenticationGuard)
   @TransformPlainToInstance(ArticleDetailsResponseDto)
@@ -72,5 +80,4 @@ export default class ArticlesController {
   async downvote(@Param('id', ParseIntPipe) id: number) {
     await this.articlesService.downvote(id);
   }
-
 }
