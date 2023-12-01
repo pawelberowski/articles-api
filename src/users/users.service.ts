@@ -4,10 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaError } from '../database/prisma-error.enum';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './dto/user.dto';
 import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -98,6 +99,55 @@ export class UsersService {
         throw new NotFoundException();
       }
       throw error;
+    }
+  }
+
+  async deleteUser(queryParams: DeleteUserDto, currentUser: User) {
+    if (queryParams.newAuthor) {
+      return this.prismaService.$transaction(async (transactionClient) => {
+        const articlesToReassign = await transactionClient.article.findMany({
+          where: {
+            authorId: currentUser.id,
+          },
+        });
+        if (!articlesToReassign.length) {
+          throw new NotFoundException('No articles to reassign');
+        }
+        const articleIds = articlesToReassign.map((article) => article.id);
+        const updateResponse = await transactionClient.article.updateMany({
+          where: {
+            id: {
+              in: articleIds,
+            },
+          },
+          data: {
+            authorId: queryParams.newAuthor,
+          },
+        });
+        if (updateResponse.count !== articleIds.length) {
+          throw new NotFoundException(
+            'One of the articles could not be reassigned',
+          );
+        }
+        await transactionClient.user.delete({
+          where: {
+            id: currentUser.id,
+          },
+        });
+      });
+    } else {
+      return this.prismaService.$transaction(async (transactionClient) => {
+        await transactionClient.article.deleteMany({
+          where: {
+            authorId: currentUser.id,
+          },
+        });
+        await transactionClient.user.delete({
+          where: {
+            id: currentUser.id,
+          },
+        });
+      });
     }
   }
 }

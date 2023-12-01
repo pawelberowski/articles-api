@@ -218,7 +218,9 @@ export class ArticlesService {
         },
       });
       if (updateResponse.count !== articleIds.length) {
-        throw new NotFoundException('One of the articles could not be reassigned');
+        throw new NotFoundException(
+          'One of the articles could not be reassigned',
+        );
       }
     });
   }
