@@ -180,7 +180,7 @@ export class ArticlesService {
         },
       });
       if (!articlesToDelete) {
-        throw new NotFoundException('Theres no Articles to delete');
+        throw new NotFoundException('There are no articles to delete');
       }
       const articleIds = articlesToDelete.map((article) => article.id);
       const deleteResponse = await transactionClient.article.deleteMany({
