@@ -135,19 +135,18 @@ export class UsersService {
           },
         });
       });
-    } else {
-      return this.prismaService.$transaction(async (transactionClient) => {
-        await transactionClient.article.deleteMany({
-          where: {
-            authorId: currentUser.id,
-          },
-        });
-        await transactionClient.user.delete({
-          where: {
-            id: currentUser.id,
-          },
-        });
-      });
     }
+    return this.prismaService.$transaction(async (transactionClient) => {
+      await transactionClient.article.deleteMany({
+        where: {
+          authorId: currentUser.id,
+        },
+      });
+      await transactionClient.user.delete({
+        where: {
+          id: currentUser.id,
+        },
+      });
+    });
   }
 }
