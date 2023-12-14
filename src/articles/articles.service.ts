@@ -87,7 +87,6 @@ export class ArticlesService {
           categories: {
             connect: categories,
           },
-          id: undefined,
         },
         where: {
           id,

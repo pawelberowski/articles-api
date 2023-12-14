@@ -64,7 +64,6 @@ export default class ArticlesController {
 
   @Delete(':id')
   @UseGuards(JwtAuthenticationGuard)
-  @TransformPlainToInstance(ArticleDetailsResponseDto)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.articlesService.delete(id);
   }
