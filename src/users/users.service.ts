@@ -136,6 +136,27 @@ export class UsersService {
     }
   }
 
+  async deleteProfileImage(photoId: number | null) {
+    if (!photoId) {
+      throw new NotFoundException('No image to delete');
+    }
+    try {
+      return await this.prismaService.profileImage.delete({
+        where: {
+          id: photoId,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
   async deleteUser(queryParams: DeleteUserDto, currentUser: User) {
     if (queryParams.newAuthor) {
       return this.prismaService.$transaction(async (transactionClient) => {
