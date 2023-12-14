@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Prisma } from '@prisma/client';
+import { Article, Category, Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
 
 @Injectable()
@@ -104,6 +104,65 @@ export class CategoriesService {
           id: categoryId,
         },
       });
+    });
+  }
+
+  async mergeDuplicateCategories() {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const allCategories = await transactionClient.category.findMany({
+        include: { articles: true },
+      });
+      let uniqueCategories: { [name: string]: Category } = {};
+      //  allCategories.forEach((category) => {
+      //   if (category.name in uniqueCategories) {
+      //     const categoryToMoveArticlesTo = uniqueCategories[category.name];
+      //     const articlesToMove = category.articles;
+      //
+      //     transactionClient.category.update({
+      //       where: {
+      //         id: categoryToMoveArticlesTo.id,
+      //       },
+      //       data: {
+      //         articles: {
+      //           connect: articlesToMove,
+      //         }
+      //       },
+      //     });
+      //
+      //     transactionClient.category.delete({
+      //       where: {
+      //         id: category.id,
+      //       },
+      //     });
+      //   } else {
+      //     uniqueCategories[category.name] = category;
+      //   }
+      // });
+      await Promise.all(
+        allCategories.map(async (category) => {
+          if (category.name in uniqueCategories) {
+            const categoryToMoveArticlesTo = uniqueCategories[category.name];
+            const articlesToMove = category.articles;
+
+            await transactionClient.category.update({
+              where: { id: categoryToMoveArticlesTo.id },
+              data: {
+                articles: {
+                  connect: articlesToMove.map((article) => ({
+                    id: article.id,
+                  })),
+                },
+              },
+            });
+
+            await transactionClient.category.delete({
+              where: { id: category.id },
+            });
+          } else {
+            uniqueCategories[category.name] = category;
+          }
+        }),
+      );
     });
   }
 }
