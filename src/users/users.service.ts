@@ -21,7 +21,7 @@ export class UsersService {
       },
       include: {
         address: true,
-        Article: true,
+        articles: true,
         profileImage: true,
       },
     });
@@ -39,7 +39,7 @@ export class UsersService {
       },
       include: {
         address: true,
-        Article: true,
+        articles: true,
         profileImage: true,
       },
     });

@@ -53,14 +53,14 @@ model User {
   phoneNumber    String?
   address        Address?      @relation(fields: [addressId], references: [id])
   addressId      Int?          @unique
-  Article        Article[]
+  articles       Article[]
   profileImage   ProfileImage? @relation(fields: [profileImageId], references: [id])
   profileImageId Int?          @unique
-  book           Book[]
+  books          Book[]
 }
 
 model Book {
-  id     Int    @id @default(autoincrement())
-  title  String
-  author User[]
+  id      Int    @id @default(autoincrement())
+  title   String
+  authors User[]
 }
