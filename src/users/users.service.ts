@@ -9,6 +9,7 @@ import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './dto/user.dto';
 import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { ProfileImageDto } from './dto/profile-image.dto';
 
 @Injectable()
 export class UsersService {
@@ -89,6 +90,39 @@ export class UsersService {
         },
         where: {
           id,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
+  async updateProfileImage(user: User, imageUrl: ProfileImageDto) {
+    try {
+      if (!user.profileImageId) {
+        return await this.prismaService.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            profileImage: {
+              create: imageUrl,
+            },
+          },
+        });
+      }
+      return await this.prismaService.profileImage.update({
+        where: {
+          id: user.profileImageId,
+        },
+        data: {
+          imageUrl: imageUrl.imageUrl,
         },
       });
     } catch (error) {
