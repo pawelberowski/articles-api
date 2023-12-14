@@ -6,7 +6,7 @@ function shortenText({ value: text }: TransformFnParams) {
     return null;
   }
   if (text.length > 100) {
-    return `${text.substring(0, 98)}${'.'.repeat(3)}`;
+    return `${text.substring(0, 98)}...`;
   }
   return text;
 }
