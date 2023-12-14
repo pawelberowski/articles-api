@@ -34,10 +34,18 @@ export class BooksService {
   }
 
   async update(id: number, book: UpdateBookDto) {
+    const authors = book.authorsIds?.map((id) => {
+      return {
+        id,
+      };
+    });
     try {
       return await this.prismaService.book.update({
         data: {
           title: book.title,
+          authors: {
+            connect: authors,
+          },
         },
         where: {
           id,

@@ -1,7 +1,12 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { CanBeUndefined } from '../../utilities/can-be-undefined';
 
 export class UpdateBookDto {
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title?: string;
+
+  @CanBeUndefined()
+  @IsNumber({}, { each: true })
+  authorsIds?: number[];
 }
