@@ -140,32 +140,28 @@ export class ArticlesService {
   }
 
   upvote(id: number) {
-    return this.prismaService.$transaction(async (transactionClient) => {
-      await transactionClient.article.update({
-        where: {
-          id,
+    return this.prismaService.article.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          increment: 1,
         },
-        data: {
-          upvotes: {
-            increment: 1,
-          },
-        },
-      });
+      },
     });
   }
 
   downvote(id: number) {
-    return this.prismaService.$transaction(async (transactionClient) => {
-      await transactionClient.article.update({
-        where: {
-          id,
+    return this.prismaService.article.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          decrement: 1,
         },
-        data: {
-          upvotes: {
-            decrement: 1,
-          },
-        },
-      });
+      },
     });
   }
 
@@ -178,7 +174,7 @@ export class ArticlesService {
           },
         },
       });
-      if (!articlesToDelete) {
+      if (!articlesToDelete.length) {
         throw new NotFoundException('There are no articles to delete');
       }
       const articleIds = articlesToDelete.map((article) => article.id);
