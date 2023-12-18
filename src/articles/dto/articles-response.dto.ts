@@ -1,5 +1,6 @@
 import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { capitalizeTitle } from '../../utilities/capitalize-title';
+import { Article } from '@prisma/client';
 
 function shortenText({ value: text }: TransformFnParams) {
   if (!text) {
@@ -18,7 +19,7 @@ function getTextLength({ obj }: TransformFnParams) {
   return obj.text.length;
 }
 
-export class ArticlesResponseDto {
+export class ArticlesResponseDto implements Article {
   id: number;
   @Transform(capitalizeTitle)
   title: string;
@@ -29,6 +30,8 @@ export class ArticlesResponseDto {
   @Expose()
   @Transform(getTextLength)
   textLength: number | null;
+
+  authorId: number;
 
   upvotes: number;
 }

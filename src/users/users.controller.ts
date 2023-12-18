@@ -40,9 +40,7 @@ export default class UsersController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Delete('delete-profile-image')
-  async deleteProfileImage(
-    @Req() request: RequestWithUser
-  ) {
+  async deleteProfileImage(@Req() request: RequestWithUser) {
     const imageId = request.user.profileImageId;
     return this.usersService.deleteProfileImage(imageId);
   }
