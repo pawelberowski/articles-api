@@ -8,5 +8,5 @@ export class UpdateBookDto {
 
   @CanBeUndefined()
   @IsNumber({}, { each: true })
-  authorsIds?: number[];
+  authorIds?: number[];
 }
