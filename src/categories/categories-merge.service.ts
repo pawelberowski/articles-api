@@ -15,27 +15,26 @@ export class CategoriesMergeService {
 
       await Promise.all(
         allCategories.map(async (category) => {
-          if (category.name in uniqueCategories) {
-            const categoryToMoveArticlesTo = uniqueCategories[category.name];
-            const articlesToMove = category.articles;
-
-            await transactionClient.category.update({
-              where: { id: categoryToMoveArticlesTo.id },
-              data: {
-                articles: {
-                  connect: articlesToMove.map((article) => ({
-                    id: article.id,
-                  })),
-                },
-              },
-            });
-
-            await transactionClient.category.delete({
-              where: { id: category.id },
-            });
-          } else {
-            uniqueCategories[category.name] = category;
+          if (!(category.name in uniqueCategories)) {
+            return (uniqueCategories[category.name] = category);
           }
+          const categoryToMoveArticlesTo = uniqueCategories[category.name];
+          const articlesToMove = category.articles;
+
+          await transactionClient.category.update({
+            where: { id: categoryToMoveArticlesTo.id },
+            data: {
+              articles: {
+                connect: articlesToMove.map((article) => ({
+                  id: article.id,
+                })),
+              },
+            },
+          });
+
+          await transactionClient.category.delete({
+            where: { id: category.id },
+          });
         }),
       );
     });
