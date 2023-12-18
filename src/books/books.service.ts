@@ -34,7 +34,7 @@ export class BooksService {
   }
 
   async update(id: number, book: UpdateBookDto) {
-    const authors = book.authorsIds?.map((id) => {
+    const authors = book.authorIds?.map((id) => {
       return {
         id,
       };
