@@ -8,14 +8,59 @@ datasource db {
 }
 
 model Article {
-  id    Int     @id @default(autoincrement())
-  title String
-  text  String?
+  id         Int        @id @default(autoincrement())
+  title      String
+  text       String?
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   Int
+  categories Category[]
+  comments   Comment[]
+  upvotes    Int        @default(0)
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  articles Article[]
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  text      String
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+}
+
+model Address {
+  id      Int    @id @default(autoincrement())
+  street  String
+  city    String
+  country String
+  user    User?
+}
+
+model ProfileImage {
+  id       Int    @id @default(autoincrement())
+  imageUrl String
+  user     User?
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  password String
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  name           String
+  password       String
+  phoneNumber    String?
+  address        Address?      @relation(fields: [addressId], references: [id])
+  addressId      Int?          @unique
+  articles       Article[]
+  profileImage   ProfileImage? @relation(fields: [profileImageId], references: [id])
+  profileImageId Int?          @unique
+  books          Book[]
+}
+
+model Book {
+  id      Int    @id @default(autoincrement())
+  title   String
+  authors User[]
 }

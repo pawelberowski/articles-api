@@ -4,9 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaError } from '../database/prisma-error.enum';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
-import { UserDto } from './user.dto';
+import { UserDto } from './dto/user.dto';
+import { UpdatePhoneNumberDto } from './dto/update-phone-number.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
+import { ProfileImageDto } from './dto/profile-image.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +19,11 @@ export class UsersService {
     const user = await this.prismaService.user.findUnique({
       where: {
         email,
+      },
+      include: {
+        address: true,
+        articles: true,
+        profileImage: true,
       },
     });
     if (!user) {
@@ -30,6 +38,11 @@ export class UsersService {
       where: {
         id,
       },
+      include: {
+        address: true,
+        articles: true,
+        profileImage: true,
+      },
     });
     if (!user) {
       throw new NotFoundException();
@@ -41,7 +54,22 @@ export class UsersService {
   async create(user: UserDto) {
     try {
       return this.prismaService.user.create({
-        data: user,
+        data: {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          phoneNumber: user.phoneNumber,
+          address: {
+            create: user.address,
+          },
+          profileImage: {
+            create: user.profileImage,
+          },
+        },
+        include: {
+          address: true,
+          profileImage: true,
+        },
       });
     } catch (error) {
       if (
@@ -52,5 +80,128 @@ export class UsersService {
       }
       throw error;
     }
+  }
+
+  async updatePhoneNumber(id: number, user: UpdatePhoneNumberDto) {
+    try {
+      return await this.prismaService.user.update({
+        data: {
+          phoneNumber: user.phoneNumber,
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
+  async updateProfileImage(user: User, imageUrl: ProfileImageDto) {
+    try {
+      if (!user.profileImageId) {
+        return await this.prismaService.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            profileImage: {
+              create: imageUrl,
+            },
+          },
+        });
+      }
+      return await this.prismaService.profileImage.update({
+        where: {
+          id: user.profileImageId,
+        },
+        data: {
+          imageUrl: imageUrl.imageUrl,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
+  async deleteProfileImage(photoId: number | null) {
+    if (!photoId) {
+      throw new NotFoundException('No image to delete');
+    }
+    try {
+      return await this.prismaService.profileImage.delete({
+        where: {
+          id: photoId,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
+  async deleteUser(queryParams: DeleteUserDto, currentUser: User) {
+    if (queryParams.newAuthor) {
+      return this.prismaService.$transaction(async (transactionClient) => {
+        const articlesToReassign = await transactionClient.article.findMany({
+          where: {
+            authorId: currentUser.id,
+          },
+        });
+        if (!articlesToReassign.length) {
+          throw new NotFoundException('No articles to reassign');
+        }
+        const articleIds = articlesToReassign.map((article) => article.id);
+        const updateResponse = await transactionClient.article.updateMany({
+          where: {
+            id: {
+              in: articleIds,
+            },
+          },
+          data: {
+            authorId: queryParams.newAuthor,
+          },
+        });
+        if (updateResponse.count !== articleIds.length) {
+          throw new NotFoundException(
+            'One of the articles could not be reassigned',
+          );
+        }
+        await transactionClient.user.delete({
+          where: {
+            id: currentUser.id,
+          },
+        });
+      });
+    }
+    return this.prismaService.$transaction(async (transactionClient) => {
+      await transactionClient.article.deleteMany({
+        where: {
+          authorId: currentUser.id,
+        },
+      });
+      await transactionClient.user.delete({
+        where: {
+          id: currentUser.id,
+        },
+      });
+    });
   }
 }
